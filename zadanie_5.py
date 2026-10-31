@@ -3,10 +3,16 @@ from tkinter import ttk
 from tkinter import messagebox as mb
 import requests
 
-def update_b_label(event):
-    code = base_combobox.get()
-    name = currencies[code]
-    b_label.config(text=name)
+def update_b1_label(event):
+    code = base1_combobox.get()
+    name = currencies.get(code, "")
+    b1_label.config(text=name)
+
+
+def update_b2_label(event):
+    code = base2_combobox.get()
+    name = currencies.get(code, "")
+    b2_label.config(text=name)
 
 def update_t_label(event):
     code = target_combobox.get()
@@ -54,24 +60,35 @@ currencies = {
 # Создание графического интерфейса
 window = Tk()
 window.title("Курс обмена валюты")
-window.geometry("360x300")
+window.geometry("380x460")
 
-Label(text="Базовая валюта:").pack(padx=10, pady=5)
-base_combobox = ttk.Combobox(values=list(currencies.keys()))
-base_combobox.pack(padx=10, pady=5)
-base_combobox.bind("<<ComboboxSelected>>", update_b_label)
+# --- Первая базовая валюта ---
+Label(text="Базовая валюта 1:").pack(padx=10, pady=5)
+base1_combobox = ttk.Combobox(values=list(currencies.keys()))
+base1_combobox.pack(padx=10, pady=5)
+base1_combobox.bind("<<ComboboxSelected>>", update_b1_label)
 
-b_label = ttk.Label()
-b_label.pack(padx=10, pady=10)
+b1_label = ttk.Label()
+b1_label.pack(padx=10, pady=5)
 
+# --- Вторая базовая валюта ---
+Label(text="Базовая валюта 2:").pack(padx=10, pady=5)
+base2_combobox = ttk.Combobox(values=list(currencies.keys()))
+base2_combobox.pack(padx=10, pady=5)
+base2_combobox.bind("<<ComboboxSelected>>", update_b2_label)
+
+b2_label = ttk.Label()
+b2_label.pack(padx=10, pady=5)
+
+# --- Целевая валюта ---
 Label(text="Целевая валюта:").pack(padx=10, pady=5)
 target_combobox = ttk.Combobox(values=list(currencies.keys()))
 target_combobox.pack(padx=10, pady=5)
 target_combobox.bind("<<ComboboxSelected>>", update_t_label)
 
 t_label = ttk.Label()
-t_label.pack(padx=10, pady=10)
+t_label.pack(padx=10, pady=5)
 
-Button(text="Получить курс обмена", command=exchange).pack(padx=10, pady=10)
+Button(text="Получить курс обмена", command=exchange).pack(padx=10, pady=15)
 
 window.mainloop()
