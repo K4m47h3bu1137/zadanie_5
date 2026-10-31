@@ -21,26 +21,58 @@ def update_t_label(event):
 
 def exchange():
     target_code = target_combobox.get()
-    base_code = base_combobox.get()
+    base1_code = base1_combobox.get()
+    base2_code = base2_combobox.get()
 
-    if target_code and base_code:
-        try:
-            response = requests.get(f'https://open.er-api.com/v6/latest/{base_code}')
-            response.raise_for_status()
+    if not (target_code and base1_code and base2_code):
+        mb.showwarning("Внимание", "Выберите все коды валют")
+        return
 
-            data = response.json()
+    try:
+        # Запрос курсов для первой базовой валюты
+        response1 = requests.get(
+            f'https://open.er-api.com/v6/latest/{base1_code}'
+        )
+        response1.raise_for_status()
+        data1 = response1.json()
 
-            if target_code in data['rates']:
-                exchange_rate = data['rates'][target_code]
-                base = currencies[base_code]
-                target = currencies[target_code]
-                mb.showinfo("Курс обмена", f"Курс {exchange_rate:.1f} {target} за 1 {base}")
-            else:
-                mb.showerror("Ошибка", f"Валюта {target_code} не найдена")
-        except Exception as e:
-            mb.showerror("Ошибка", f"Ошибка: {e}")
-    else:
-        mb.showwarning("Внимание", "Выберите коды валют")
+        # Запрос курсов для второй базовой валюты
+        response2 = requests.get(
+            f'https://open.er-api.com/v6/latest/{base2_code}'
+        )
+        response2.raise_for_status()
+        data2 = response2.json()
+
+        result_lines = []
+
+        if target_code in data1['rates']:
+            rate1 = data1['rates'][target_code]
+            base1_name = currencies[base1_code]
+            target_name = currencies[target_code]
+            result_lines.append(
+                f"1 {base1_name} = {rate1:.2f} {target_name}"
+            )
+        else:
+            result_lines.append(
+                f"Валюта {target_code} не найдена для {base1_code}"
+            )
+
+        if target_code in data2['rates']:
+            rate2 = data2['rates'][target_code]
+            base2_name = currencies[base2_code]
+            target_name = currencies[target_code]
+            result_lines.append(
+                f"1 {base2_name} = {rate2:.2f} {target_name}"
+            )
+        else:
+            result_lines.append(
+                f"Валюта {target_code} не найдена для {base2_code}"
+            )
+
+        mb.showinfo("Курсы обмена", "\n".join(result_lines))
+
+    except Exception as e:
+        mb.showerror("Ошибка", f"Ошибка: {e}")
 
 # Словарь кодов валют и их полных названий
 currencies = {
